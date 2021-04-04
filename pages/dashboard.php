@@ -69,6 +69,16 @@ $this->vars['view_list'] = [
     'template' => 'posts-body.hmtl'
   ],
   [
+    'id'=>'date',
+    'desc' => 'Group Posts By Date',
+    'template' => 'posts-date.html'
+  ],
+  [
+    'id'=>'sub',
+    'desc' => 'Group Posts By SubReddit',
+    'template' => 'posts-sub.html'
+  ],
+  [
     'id'=>'calendar',
     'desc' => 'Calendar (WIP)',
     'template' => 'posts-calendar.html'
@@ -102,6 +112,44 @@ case 'calendar':
     $month = date('n', $post->when_original);
     $day = date('j', $post->when_original);
     $indexedPosts[$year][$month][$day][] = $post;
+  }
+
+  $this->vars['posts'] = $indexedPosts;
+
+  break;
+case 'date':
+
+  $this->vars['view'] = 'posts-date.html';
+
+  $indexedPosts = [];
+  foreach ($posts as $post) {
+    $date = date('Y/n/j', $post->when);
+
+    $body = $post['body'];
+
+    if (!is_url($body)) continue;
+
+    $post['thumb'] = getThumb($body);
+    $indexedPosts[$date][] = $post;
+  }
+
+  $this->vars['posts'] = $indexedPosts;
+
+  break;
+case 'sub':
+
+  $this->vars['view'] = 'posts-sub.html';
+
+  $indexedPosts = [];
+  foreach ($posts as $post) {
+    $subreddit = strtolower($post->subreddit);
+
+    $body = $post['body'];
+
+    if (!is_url($body)) continue;
+
+    $post['thumb'] = getThumb($body);
+    $indexedPosts[$subreddit][] = $post;
   }
 
   $this->vars['posts'] = $indexedPosts;
